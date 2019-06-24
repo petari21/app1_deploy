@@ -11,6 +11,8 @@ const gitRepo = 'https://github.com/petari21'
 
 const buildName = 'kaniko-build'
 
+const appName = 'app1_deploy'
+
 const kc = new k8s.KubeConfig()
 kc.loadFromCluster()
 server = kc.getCurrentCluster().server
@@ -67,8 +69,6 @@ function buildImageFromSource(appName, sourceRevision, imageName, tagName, build
     return build
 }
 
-const appName = 'app1'
-
 // first delete an existing build (if existing)
 deleteBuild(buildName, server)
 
@@ -90,8 +90,7 @@ if (hasCert) {
     options.cert = fs.readFileSync(certFile)
 }
 
-request.post(options,
-    }, (error, response, body) => {
+request.post(options, (error, response, body) => {
     if (error) {
         console.log(`error: ${error}`);
     }
