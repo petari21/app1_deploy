@@ -11,7 +11,7 @@ const gitRepo = 'https://github.com/petari21'
 
 const buildName = 'kaniko-build'
 
-const appName = 'app1_deploy'
+const appName = 'app1'
 
 const kc = new k8s.KubeConfig()
 kc.loadFromCluster()
