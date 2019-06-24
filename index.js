@@ -13,6 +13,13 @@ const buildName = 'kaniko-build'
 
 const appName = 'app1'
 
+try {
+    const tf = fs.readFileSync('/var/run/secrets/kubernetes.io/serviceaccount/token')
+    console.log('Found token file: ', tf)
+} catch(e) {
+    console.log('No token file')
+}
+
 const kc = new k8s.KubeConfig()
 kc.loadFromCluster()
 server = kc.getCurrentCluster().server
