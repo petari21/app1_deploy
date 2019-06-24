@@ -71,7 +71,7 @@ function buildImageFromSource(appName, sourceRevision, imageName, tagName, build
 }
 
 // first delete an existing build (if existing)
-deleteBuild(buildName, server)
+//deleteBuild(buildName, server)
 
 // construct build call
 build = buildImageFromSource(appName, 'master', appName, 'build', buildName)
@@ -89,6 +89,7 @@ const options = {
 
 if (hasCert) {
     options.cert = fs.readFileSync(certFile)
+    console.log(`CERT_FILE: ${options.cert}`)
 }
 
 request.post(options, (error, response, body) => {
