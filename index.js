@@ -1,5 +1,5 @@
-const k8s = require('@kubernetes/client-node');
-const request = require('request');
+const k8s = require('@kubernetes/client-node')
+const request = require('request')
 const fs = require('fs')
 
 // Docker repo conf
@@ -11,8 +11,8 @@ const gitRepo = 'https://github.com/petari21'
 
 const buildName = 'kaniko-build'
 
-const kc = new k8s.KubeConfig();
-kc.loadFromDefault();
+const kc = new k8s.KubeConfig()
+kc.loadFromCluster()
 server = kc.getCurrentCluster().server
 
 function deleteBuild(buildName, server) {
