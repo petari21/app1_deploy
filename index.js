@@ -19,34 +19,6 @@ server = kc.getCurrentCluster().server
 
 console.log('SERVER: ', server)
 
-const certFile = '/var/run/secrets/kubernetes.io/serviceaccount/ca.crt'
-let hasCert = false
-try {
-    if (fs.existsSync(certFile)) {
-        hasCert = true
-    }
-} catch(e) {
-    console.error(e)
-}
-
-function deleteBuild(buildName, server) {
-    url = `${server}/apis/build.knative.dev/v1alpha1/namespaces/default/builds/${buildName}`
-    const options = {url}
-    if (hasCert) {
-        options.cert = fs.readFileSync(certFile)
-        console.log(`CERT_FILE: ${options.cert}`)
-    }
-    request.delete(options, (error, response, body) => {
-        if (error) {
-            console.log(`error: ${error}`);
-        }
-        if (response) {
-            console.log(`statusCode: ${response.statusCode}`);
-        }
-        console.log(`body: ${body}`);
-    })
-}
-
 function buildImageFromSource(appName, sourceRevision, imageName, tagName, buildName) {
     const build = {}
 
@@ -72,9 +44,6 @@ function buildImageFromSource(appName, sourceRevision, imageName, tagName, build
     return build
 }
 
-// first delete an existing build (if existing)
-//deleteBuild(buildName, server)
-
 // construct build call
 build = buildImageFromSource(appName, 'master', appName, 'build', buildName)
 
@@ -90,7 +59,7 @@ const options = {
 }
 
 const opts = {}
-kc.applyToRequest(opts)
+kc.applytoHTTPSOptions(opts)
 
 Object.assign(opts, options)
 
