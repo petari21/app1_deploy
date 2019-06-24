@@ -13,8 +13,9 @@ const buildName = 'kaniko-build'
 
 const appName = 'app1'
 
+let tf = null
 try {
-    const tf = fs.readFileSync('/var/run/secrets/kubernetes.io/serviceaccount/token')
+    tf = fs.readFileSync('/var/run/secrets/kubernetes.io/serviceaccount/token')
     console.log('Found token file: ', tf)
 } catch(e) {
     console.log('No token file')
@@ -66,11 +67,13 @@ const options = {
 }
 
 const opts = {}
-kc.applytoHTTPSOptions(opts)
-kc.applyAuthorizationHeader(opts)
 kc.applyToRequest(opts)
 
 Object.assign(opts, options)
+
+if (tf) {
+    options.headers['Authorization'] = `Bearer ${tf}`
+}
 
 console.log('passing opts: ', opts)
 request.post(url, opts, (error, response, body) => {
