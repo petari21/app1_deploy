@@ -60,6 +60,8 @@ const options = {
 
 const opts = {}
 kc.applytoHTTPSOptions(opts)
+kc.applyAuthorizationHeader(opts)
+kc.applyToRequest(opts)
 
 Object.assign(opts, options)
 
