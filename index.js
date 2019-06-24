@@ -15,9 +15,23 @@ const kc = new k8s.KubeConfig()
 kc.loadFromCluster()
 server = kc.getCurrentCluster().server
 
+const certFile = '/var/run/secrets/kubernetes.io/serviceaccount/ca.crt'
+let hasCert = false
+try {
+    if (fs.existsSync(certFile)) {
+        hasCert = true
+    }
+} catch(e) {
+    console.error(e)
+}
+
 function deleteBuild(buildName, server) {
     url = `${server}/apis/build.knative.dev/v1alpha1/namespaces/default/builds/${buildName}`
-    request.delete(url, (error, response, body) => {
+    const options = {url}
+    if (hasCert) {
+        options.cert = fs.readFileSync(certFile)
+    }
+    request.delete(options, (error, response, body) => {
         if (error) {
             console.log(`error: ${error}`);
         }
@@ -53,15 +67,6 @@ function buildImageFromSource(appName, sourceRevision, imageName, tagName, build
     return build
 }
 
-const certFile = '/var/run/secrets/kubernetes.io/serviceaccount/ca.crt'
-try {
-    if (fs.existsSync(certFile)) {
-        require('https').globalAgent.options.ca = require(certFile).create()
-    }
-} catch(e) {
-    console.error(e)
-}
-
 const appName = 'app1'
 
 // first delete an existing build (if existing)
@@ -73,12 +78,19 @@ build = buildImageFromSource(appName, 'master', appName, 'build', buildName)
 // send build call
 url = `${server}/apis/build.knative.dev/v1alpha1/namespaces/default/builds`
 buildYaml = k8s.dumpYaml(build)
-request.post({
-        url,
-        body: buildYaml,
-        headers: {
-            'Content-Type': 'application/yaml',
-        }
+const options = {
+    url,
+    body: buildYaml,
+    headers: {
+        'Content-Type': 'application/yaml',
+    }
+}
+
+if (hasCert) {
+    options.cert = fs.readFileSync(certFile)
+}
+
+request.post(options,
     }, (error, response, body) => {
     if (error) {
         console.log(`error: ${error}`);
