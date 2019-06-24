@@ -1,5 +1,6 @@
 const k8s = require('@kubernetes/client-node');
 const request = require('request');
+const fs = require('fs')
 
 // Docker repo conf
 const dockerRepo = 'docker.io'
@@ -52,11 +53,22 @@ function buildImageFromSource(appName, sourceRevision, imageName, tagName, build
     return build
 }
 
+const certFile = '/var/run/secrets/kubernetes.io/serviceaccount/ca.crt'
+try {
+    if (fs.existsSync(certFile)) {
+        require('https').globalAgent.options.ca = require(certFile).create()
+    }
+} catch(e) {
+    console.error(e)
+}
+
+const appName = 'app1'
+
 // first delete an existing build (if existing)
 deleteBuild(buildName, server)
 
 // construct build call
-build = buildImageFromSource('app1', 'master', 'app1', 'build', buildName)
+build = buildImageFromSource(appName, 'master', appName, 'build', buildName)
 
 // send build call
 url = `${server}/apis/build.knative.dev/v1alpha1/namespaces/default/builds`

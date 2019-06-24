@@ -1,0 +1,22 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app1-deployment
+  labels:
+    app: app1-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app1-deploy
+  template:
+    metadata:
+      labels:
+        app: app1-deploy
+    spec:
+      containers:
+      - name: app1-deploy
+        image: petari/app1_deploy:build
+        ports:
+        - containerPort: 7000
