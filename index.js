@@ -32,6 +32,7 @@ function deleteBuild(buildName, server) {
     const options = {url}
     if (hasCert) {
         options.cert = fs.readFileSync(certFile)
+        console.log(`CERT_FILE: ${options.cert}`)
     }
     request.delete(options, (error, response, body) => {
         if (error) {
