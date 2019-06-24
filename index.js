@@ -17,6 +17,8 @@ const kc = new k8s.KubeConfig()
 kc.loadFromCluster()
 server = kc.getCurrentCluster().server
 
+console.log('SERVER: ', server)
+
 const certFile = '/var/run/secrets/kubernetes.io/serviceaccount/ca.crt'
 let hasCert = false
 try {
@@ -79,20 +81,21 @@ build = buildImageFromSource(appName, 'master', appName, 'build', buildName)
 // send build call
 url = `${server}/apis/build.knative.dev/v1alpha1/namespaces/default/builds`
 buildYaml = k8s.dumpYaml(build)
+
 const options = {
-    url,
     body: buildYaml,
     headers: {
         'Content-Type': 'application/yaml',
     }
 }
 
-if (hasCert) {
-    options.cert = fs.readFileSync(certFile)
-    console.log(`CERT_FILE: ${options.cert}`)
-}
+const opts = {}
+kc.applyToRequest(opts)
 
-request.post(options, (error, response, body) => {
+Object.assign(opts, options)
+
+console.log('passing opts: ', opts)
+request.post(url, opts, (error, response, body) => {
     if (error) {
         console.log(`error: ${error}`);
     }
