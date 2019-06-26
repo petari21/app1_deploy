@@ -1,0 +1,25 @@
+---
+apiVersion: serving.knative.dev/v1alpha1
+kind: Service
+metadata:
+  name: build-and-deploy
+  namespace: default
+spec:
+  runLatest:
+    configuration:
+      build:
+        serviceAccountName: build-bot
+        source:
+          git:
+            url: https://github.com/petari21/app1.git
+            revision: master
+        template:
+          name: kaniko
+          arguments:
+          - name: IMAGE
+            value: petari/app1:build
+      revisionTemplate:
+        spec:
+          container:
+            image: petari/app1:build
+            imagePullPolicy: Always
